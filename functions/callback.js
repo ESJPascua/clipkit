@@ -2,7 +2,7 @@
 // Exchanges the code, finds out who they are, checks they have ClipForge Pro, then sets a session cookie.
 import { verify, sign, getCookie, cookie, page, checkAccess, configError, PKCE_COOKIE, SESSION_COOKIE, SESSION_HOURS } from '../lib/auth.js';
 
-const CHECKOUT = 'https://whop.com/checkout/plan_Ck8NEnFvXmkP6';
+const CHECKOUT = 'https://whop.com/checkout/ch_h5F7c9AvjMIpgVJ/';
 
 export async function onRequestGet({ request, env }) {
   const missing = configError(env);
