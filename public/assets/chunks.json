@@ -1,0 +1,39 @@
+{
+ "models/whisper-tiny.en_timestamped/onnx/encoder_model_quantized.onnx": {
+  "size": 10097112,
+  "parts": [
+   "models/whisper-tiny.en_timestamped/onnx/encoder_model_quantized.onnx.000.bin"
+  ]
+ },
+ "models/whisper-tiny.en_timestamped/onnx/decoder_model_merged_quantized.onnx": {
+  "size": 30729881,
+  "parts": [
+   "models/whisper-tiny.en_timestamped/onnx/decoder_model_merged_quantized.onnx.000.bin",
+   "models/whisper-tiny.en_timestamped/onnx/decoder_model_merged_quantized.onnx.001.bin",
+   "models/whisper-tiny.en_timestamped/onnx/decoder_model_merged_quantized.onnx.002.bin"
+  ]
+ },
+ "models/whisper-base.en_timestamped/onnx/encoder_model_quantized.onnx": {
+  "size": 23159173,
+  "parts": [
+   "models/whisper-base.en_timestamped/onnx/encoder_model_quantized.onnx.000.bin",
+   "models/whisper-base.en_timestamped/onnx/encoder_model_quantized.onnx.001.bin"
+  ]
+ },
+ "models/whisper-base.en_timestamped/onnx/decoder_model_merged_quantized.onnx": {
+  "size": 53712196,
+  "parts": [
+   "models/whisper-base.en_timestamped/onnx/decoder_model_merged_quantized.onnx.000.bin",
+   "models/whisper-base.en_timestamped/onnx/decoder_model_merged_quantized.onnx.001.bin",
+   "models/whisper-base.en_timestamped/onnx/decoder_model_merged_quantized.onnx.002.bin",
+   "models/whisper-base.en_timestamped/onnx/decoder_model_merged_quantized.onnx.003.bin"
+  ]
+ },
+ "vendor/ort.wasm": {
+  "size": 21596019,
+  "parts": [
+   "vendor/ort.wasm.000.bin",
+   "vendor/ort.wasm.001.bin"
+  ]
+ }
+}

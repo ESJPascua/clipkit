@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClipKit: free tools for clippers</title>
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0c0f;--panel:#13151a;--panel2:#1a1d24;--line:#252932;--line2:#323743;--text:#eceef2;--dim:#9aa1ad;--mute:#666d7a;--acc:#d7ff3d;--accInk:#141700;--good:#4ade80;--warn:#ffb547;--bad:#ff5c5c;--blue:#5ab4ff}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Inter Tight",system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--acc)}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+header{padding:34px 0 18px}
+.brand{display:flex;align-items:center;gap:10px;font:400 15px "Anton",sans-serif;letter-spacing:.6px;color:var(--dim)}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:var(--acc);display:grid;place-items:center;color:var(--accInk);font-size:15px}
+h1{font:400 clamp(40px,7vw,68px)/.95 "Anton",sans-serif;letter-spacing:.5px;margin:18px 0 10px;text-transform:uppercase}
+h1 em{font-style:normal;color:var(--acc)}
+.lede{color:var(--dim);font-size:17px;max-width:620px;margin:0}
+nav{position:sticky;top:0;z-index:5;background:rgba(11,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-top:22px}
+nav .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav a{flex:none;padding:13px 12px;color:var(--dim);text-decoration:none;font-weight:600;font-size:14px;border-bottom:2px solid transparent}
+nav a.on{color:var(--text);border-color:var(--acc)}
+section.view{display:none;padding:26px 0 40px}
+section.view.on{display:block}
+h2{font:400 30px/1.05 "Anton",sans-serif;letter-spacing:.4px;margin:0 0 6px;text-transform:uppercase}
+.sub{color:var(--dim);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--mute)}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld label{font-size:13px;color:var(--dim);display:flex;justify-content:space-between}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0d0f12;border:1px solid var(--line2);border-radius:9px;padding:9px 11px;outline:0}
+input:focus,select:focus,textarea:focus{border-color:#4b5263}
+.pre{position:relative}
+.pre span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--mute)}
+.pre input{padding-left:24px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.chip{border:1px solid var(--line2);background:#0d0f12;color:var(--dim);border-radius:20px;padding:4px 11px;font-size:13px}
+.chip:hover,.chip.on{color:var(--accInk);background:var(--acc);border-color:var(--acc)}
+.big{font:700 clamp(34px,6vw,48px)/1 "JetBrains Mono",monospace;color:var(--acc);letter-spacing:-1px}
+.big small{font-size:.42em;color:var(--dim);letter-spacing:0;margin-left:6px}
+.rows{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.r{display:flex;justify-content:space-between;gap:12px;font-size:14px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.r span:first-child{color:var(--dim)}
+.r b{font-family:"JetBrains Mono",monospace;font-weight:500}
+.alert{border-radius:10px;padding:10px 12px;font-size:14px;margin-top:14px}
+.alert.warn{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.35);color:#ffd59a}
+.alert.good{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);color:#b8f5cd}
+.alert.bad{background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.35);color:#ffc0c0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 14px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);font-weight:700;font-size:14px;text-decoration:none;color:var(--text)}
+.btn:hover{border-color:#454c5c}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--accInk)}
+.btn.sm{height:28px;padding:0 10px;font-size:12px;border-radius:7px}
+.out{display:flex;flex-direction:column;gap:8px}
+.hook{display:flex;align-items:center;gap:10px;background:#0d0f12;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.hook .t{flex:1;font:400 19px/1.15 "Anton",sans-serif;letter-spacing:.4px}
+.wc{font:500 11px "JetBrains Mono",monospace;padding:2px 7px;border-radius:12px;white-space:nowrap}
+.wc.g{color:var(--good);background:rgba(74,222,128,.1)} .wc.y{color:var(--warn);background:rgba(255,181,71,.1)}
+.box{background:#0d0f12;border:1px solid var(--line);border-radius:10px;padding:12px;white-space:pre-wrap;font-size:14px;min-height:44px}
+.boxhead{display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px;font-size:13px;color:var(--dim)}
+.check{display:flex;flex-direction:column;gap:2px}
+.check label{display:flex;gap:11px;align-items:flex-start;padding:9px 6px;border-radius:8px;cursor:pointer}
+.check label:hover{background:var(--panel2)}
+.check input{width:18px;height:18px;margin-top:2px;accent-color:var(--acc);flex:none}
+.check label.done span{color:var(--mute);text-decoration:line-through}
+.meter{height:8px;background:#0d0f12;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;background:var(--acc);width:0;transition:width .2s}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.slot{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:#0d0f12;margin-bottom:8px}
+.slot .tm{font:700 14px "JetBrains Mono",monospace;color:var(--acc);min-width:168px;white-space:nowrap}
+.slot .tm small{display:block;font:500 11px "Inter Tight",system-ui,sans-serif;color:var(--mute)}
+.note{color:var(--mute);font-size:13px}
+.cf{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:center}
+@media (max-width:760px){.cf{grid-template-columns:1fr}}
+.feat{list-style:none;padding:0;margin:14px 0 18px;display:flex;flex-direction:column;gap:8px}
+.feat li{padding-left:24px;position:relative;color:var(--dim)}
+.feat li::before{content:"";position:absolute;left:2px;top:8px;width:10px;height:10px;border-radius:3px;background:var(--acc)}
+.feat b{color:var(--text)}
+.phone{aspect-ratio:9/16;max-height:420px;margin:0 auto;border-radius:22px;border:6px solid #23262e;background:linear-gradient(160deg,#2a2f3a,#0d0f12);position:relative;overflow:hidden}
+.phone .hk{position:absolute;top:12%;left:50%;transform:translateX(-50%);background:#fff;color:#000;font:800 15px/1.15 "Inter Tight";padding:6px 10px;border-radius:7px;text-align:center;width:78%}
+.phone .cp{position:absolute;top:66%;left:0;right:0;text-align:center;font:400 30px "Anton";color:#fff;-webkit-text-stroke:5px #000;paint-order:stroke fill;letter-spacing:.5px}
+.phone .cp b{color:var(--acc);font-weight:400}
+footer{border-top:1px solid var(--line);padding:30px 0 50px;margin-top:10px}
+.follow{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.follow a{display:flex;flex-direction:column;padding:12px 16px;border:1px solid var(--line2);border-radius:12px;text-decoration:none;color:var(--text);background:var(--panel);min-width:190px}
+.follow a:hover{border-color:var(--acc)}
+.follow a small{color:var(--mute);font-size:12px}
+.follow a b{font-size:15px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--acc);color:var(--accInk);font-weight:700;padding:9px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;z-index:20}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="brand"><div class="logo">▶</div>CLIPKIT</div>
+  <h1>Free tools for <em>clippers</em></h1>
+  <p class="lede">Work out what a clip pays, write hooks and captions that stop the scroll, check a clip before it goes up, and post at the right time. Free, no sign-up.</p>
+</header>
+
+<nav><div class="wrap">
+  <a href="#earnings" data-v="earnings">💸 Earnings</a>
+  <a href="#hooks" data-v="hooks">🪝 Hooks &amp; captions</a>
+  <a href="#checklist" data-v="checklist">✅ Pre-post check</a>
+  <a href="#post-times" data-v="post-times">🕒 When to post</a>
+  <a href="#clipforge" data-v="clipforge">✂️ Clip maker <span style="font-size:10px;background:var(--acc);color:var(--accInk);padding:1px 6px;border-radius:10px;margin-left:3px;font-weight:800">PRO</span></a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- EARNINGS -->
+<section class="view" id="v-earnings">
+  <h2>Clip earnings calculator</h2>
+  <p class="sub">For per-view clipping campaigns on any platform. Pay = views ÷ 1,000 × rate, minus the platform fee, up to the campaign's cap.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>One clip</h3>
+      <div class="fld"><label>Views on the clip</label><input type="number" id="eViews" min="0" step="1000" value="50000"></div>
+      <div class="fld"><label>Rate per 1,000 views</label><div class="pre"><span>$</span><input type="number" id="eRate" min="0" step="0.25" value="2"></div>
+        <div class="chips" id="rateChips"></div></div>
+      <div class="two">
+        <div class="fld"><label>Platform fee</label><div class="pre"><span>%</span><input type="number" id="eFee" min="0" max="50" step="1" value="10"></div></div>
+        <div class="fld"><label>Your currency</label><select id="eCur"></select></div>
+      </div>
+      <div class="two">
+        <div class="fld"><label>Minimum payout</label><div class="pre"><span>$</span><input type="number" id="eMin" min="0" step="1" value="5"></div></div>
+        <div class="fld"><label>Max payout per clip</label><div class="pre"><span>$</span><input type="number" id="eMax" min="0" step="50" value="1000"></div></div>
+      </div>
+      <div class="fld" id="fxRow"><label><span>1 USD = <span id="fxCode"></span></span><span class="note">approximate, edit to today's rate</span></label><input type="number" id="eFx" min="0" step="any"></div>
+      <p class="note">Check the campaign page for its real rate, minimum and cap.</p>
+    </div>
+    <div class="card">
+      <h3>You'd take home</h3>
+      <div class="big" id="eNet">$0</div>
+      <div style="color:var(--dim);font:500 18px 'JetBrains Mono',monospace;margin-top:6px" id="eNetPhp"></div>
+      <div class="rows">
+        <div class="r"><span>Before fee</span><b id="eGross"></b></div>
+        <div class="r"><span>Fee</span><b id="eFeeAmt"></b></div>
+        <div class="r"><span>Views needed to reach the minimum</span><b id="eMinViews"></b></div>
+        <div class="r"><span>Views where the cap stops paying</span><b id="eCapViews"></b></div>
+      </div>
+      <div id="eAlert"></div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h3>Monthly goal planner</h3>
+      <div class="fld"><label>Monthly goal <span class="note" id="gCurNote"></span></label><input type="number" id="gGoal" min="0" step="any" value="200"></div>
+      <div class="two">
+        <div class="fld"><label>Clips you post a day</label><input type="number" id="gClips" min="1" step="1" value="3"></div>
+        <div class="fld"><label>Accounts</label><input type="number" id="gAcc" min="1" step="1" value="1"></div>
+      </div>
+      <p class="note">Uses the rate and fee from above.</p>
+    </div>
+    <div class="card">
+      <h3>To hit that, each clip needs about</h3>
+      <div class="big" id="gViews">0<small>views</small></div>
+      <div class="rows">
+        <div class="r"><span>Clips a month</span><b id="gMonthClips"></b></div>
+        <div class="r"><span>Total views a month</span><b id="gTotal"></b></div>
+        <div class="r"><span>Each clip earns about</span><b id="gPer"></b></div>
+      </div>
+      <div id="gAlert"></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOOKS -->
+<section class="view" id="v-hooks">
+  <h2>Hook &amp; caption generator</h2>
+  <p class="sub">Fill in the moment. Get on-screen hook headlines, a post caption, hashtags and a Shorts title, built on formulas that work for streamer and podcast clips.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>The moment</h3>
+      <div class="fld"><label>Type of moment</label>
+        <select id="hType">
+          <option value="reaction">Big reaction (scream, laugh, rage)</option>
+          <option value="first">A first (first time playing / seeing it)</option>
+          <option value="reveal">Feature reveal / "did you know"</option>
+          <option value="fail">Fail or win</option>
+          <option value="take">Hot take / bold claim</option>
+          <option value="funny">Funny exchange</option>
+          <option value="story">Story / confession (podcast)</option>
+        </select></div>
+      <div class="two">
+        <div class="fld"><label>Game or topic</label><input type="text" id="hTopic" value="GTA 6" placeholder="GTA 6, dating, money…"></div>
+        <div class="fld"><label>Creator</label><input type="text" id="hCreator" value="" placeholder="Streamer or podcast name"></div>
+      </div>
+      <div class="fld"><label>What happens, in a few words <span class="note">optional</span></label><input type="text" id="hThing" placeholder="the car drives itself, he loses everything…"></div>
+      <div class="two">
+        <div class="fld"><label>Niche</label><select id="hNiche"><option value="gaming">Gaming / streamer</option><option value="podcast">Podcast</option><option value="irl">IRL stream</option></select></div>
+        <div class="fld"><label>Posting to</label><select id="hPlat"><option value="tiktok">TikTok</option><option value="ig">Instagram Reels</option><option value="yt">YouTube Shorts</option></select></div>
+      </div>
+      <button class="btn pri" id="hGo" style="width:100%">Shuffle new hooks</button>
+    </div>
+    <div class="card">
+      <h3>Hook headlines (on screen, frame one)</h3>
+      <div class="out" id="hHooks"></div>
+      <p class="note" style="margin:10px 0 0">Aim for 5–8 words. The clip has to pay the hook off, or completion drops.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Post copy</h3>
+    <div class="boxhead"><span>Caption</span><button class="btn sm" data-copy="hCaption">Copy</button></div>
+    <div class="box" id="hCaption"></div>
+    <div class="boxhead"><span>Hashtags <span class="note" id="hTagNote"></span></span><button class="btn sm" data-copy="hTags">Copy</button></div>
+    <div class="box" id="hTags"></div>
+    <div class="boxhead"><span>YouTube Shorts title <span class="note" id="hTitleNote"></span></span><button class="btn sm" data-copy="hTitle">Copy</button></div>
+    <div class="box" id="hTitle"></div>
+    <p class="note" style="margin-top:12px">Add any tags or mentions the campaign brief requires. Missing tags are a top reason clips get rejected.</p>
+  </div>
+</section>
+
+<!-- CHECKLIST -->
+<section class="view" id="v-checklist">
+  <h2>Pre-post check</h2>
+  <p class="sub">Run through this before every clip goes up. It saves on this device, so tick as you go.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Quick grade</h3>
+      <div class="two">
+        <div class="fld"><label>Clip length (seconds)</label><input type="number" id="cLen" min="1" step="1" value="18"></div>
+        <div class="fld"><label>Hook headline</label><input type="text" id="cHook" placeholder="WAIT FOR HIS REACTION"></div>
+      </div>
+      <div id="cGrade"></div>
+    </div>
+    <div class="card">
+      <h3>Progress</h3>
+      <div class="big" id="cScore">0/13</div>
+      <div class="meter" style="margin:12px 0"><i id="cMeter"></i></div>
+      <button class="btn" id="cReset">Reset for next clip</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="check" id="cList"></div></div>
+</section>
+
+<!-- POST TIMES -->
+<section class="view" id="v-post-times">
+  <h2>When to post</h2>
+  <p class="sub">Pick where most of your viewers live. You'll get the best windows in <b>their</b> day, converted to <b>your</b> time (<span id="tzName"></span>).</p>
+  <div class="card">
+    <h3>Where's your audience?</h3>
+    <div class="chips" id="audChips"></div>
+    <p class="note" style="margin:10px 0 0">Not sure? Check the audience or "top locations" tab in your analytics after a week. English streamer and podcast clips usually lean US.</p>
+  </div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h3 id="slotHead">Best windows</h3>
+      <div id="slots"></div>
+    </div>
+    <div class="card">
+      <h3>Good to know</h3>
+      <ul class="feat" style="margin:0">
+        <li><b>Evenings win almost everywhere.</b> Most people scroll after school or work.</li>
+        <li><b>Post 30–60 minutes before the window</b> so the clip is already being tested when the rush starts.</li>
+        <li><b>Mixed audience?</b> Pick the biggest country for your best clip and the second one for your next.</li>
+        <li><b>These are starting points.</b> Studies disagree a lot, so after a week trust your own analytics.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>How often</h3>
+    <table>
+      <tr><th>Platform</th><th>New account (month 1)</th><th>Warmed-up account</th></tr>
+      <tr><td>TikTok</td><td>1 a day</td><td>1–3 a day</td></tr>
+      <tr><td>Instagram Reels</td><td>3–5 a week</td><td>4–7 a week</td></tr>
+      <tr><td>YouTube Shorts</td><td>3–5 a week</td><td>Daily, up to 2 a day</td></tr>
+    </table>
+    <p class="note" style="margin-top:12px">On trends, speed beats timing: a clip posted 2 hours after the moment beats a perfectly timed one 2 days later. Never post a weak clip just to hit a number.</p>
+  </div>
+</section>
+
+<!-- CLIPFORGE -->
+<section class="view" id="v-clipforge">
+  <div class="card cf">
+    <div>
+      <h2>ClipForge Pro</h2>
+      <p class="sub" style="margin-bottom:0">Turn a VOD or podcast into vertical clips in your browser. Nothing gets uploaded and there's no watermark. <b style="color:var(--text)">$3 a month</b>, cancel anytime.</p>
+      <ul class="feat">
+        <li><b>Auto captions burned in</b>, word-by-word highlight, swears starred</li>
+        <li><b>9:16 reframe</b>: tight crop, full frame + blur, or facecam over gameplay</li>
+        <li><b>Hook headline</b> on screen from frame one</li>
+        <li><b>Finds loud moments</b> and lets you search what was said</li>
+        <li><b>Cuts dead air</b> in one click, exports 1080×1920 MP4</li>
+      </ul>
+      <a class="btn pri" id="proBtn" target="_blank" rel="noopener">Get Pro: $3/month</a>
+      <a class="btn" href="/forge/" style="margin-left:6px">Already a member? Open ClipForge</a>
+      <p class="note" style="margin-top:10px" id="proNote">You sign in with your Whop account. Works best in Chrome or Edge on a laptop.</p>
+    </div>
+    <div class="phone"><div class="hk">WAIT FOR HIS REACTION</div><div class="cp">HE <b>ACTUALLY</b> DID IT</div></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p class="note" style="margin:0">Numbers here are creator benchmarks from 2026 clipping guides, not official platform rules. Campaign terms change; always check the campaign page.</p>
+</footer>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const store = { get(k,d){ try{ const v = localStorage.getItem('czkit:'+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem('czkit:'+k, JSON.stringify(v)); }catch(e){} } };
+const usd = v => '$' + (v >= 100 ? Math.round(v).toLocaleString('en-US') : v.toFixed(2));
+const CUR = [
+  ['USD','US dollar',1],['PHP','Philippine peso',62.5],['INR','Indian rupee',88],['EUR','Euro',0.87],['GBP','British pound',0.76],
+  ['CAD','Canadian dollar',1.4],['AUD','Australian dollar',1.53],['IDR','Indonesian rupiah',16600],['MYR','Malaysian ringgit',4.2],
+  ['THB','Thai baht',33],['VND','Vietnamese dong',26300],['PKR','Pakistani rupee',282],['BDT','Bangladeshi taka',122],['NGN','Nigerian naira',1500],
+  ['KES','Kenyan shilling',129],['ZAR','South African rand',18],['BRL','Brazilian real',5.4],['MXN','Mexican peso',18.5],['ARS','Argentine peso',1400],['COP','Colombian peso',3900],['TRY','Turkish lira',42],['AED','UAE dirham',3.67],['SAR','Saudi riyal',3.75],['JPY','Japanese yen',152],['KRW','South Korean won',1400]
+];
+const REGION_CUR = { US:'USD',PH:'PHP',IN:'INR',GB:'GBP',IE:'EUR',DE:'EUR',FR:'EUR',ES:'EUR',IT:'EUR',NL:'EUR',PT:'EUR',BE:'EUR',AT:'EUR',FI:'EUR',GR:'EUR',CA:'CAD',AU:'AUD',ID:'IDR',MY:'MYR',TH:'THB',VN:'VND',PK:'PKR',BD:'BDT',NG:'NGN',KE:'KES',ZA:'ZAR',BR:'BRL',MX:'MXN',AR:'ARS',CO:'COP',TR:'TRY',AE:'AED',SA:'SAR',JP:'JPY',KR:'KRW' };
+function guessCur(){ try { const langs = navigator.languages || [navigator.language]; for (const l of langs){ const r = (l.split('-')[1] || '').toUpperCase(); if (REGION_CUR[r]) return REGION_CUR[r]; } } catch(e){} return 'USD'; }
+CUR.forEach(([c, n]) => { const o = document.createElement('option'); o.value = c; o.textContent = c + ' · ' + n; $('eCur').append(o); });
+const curCode = () => $('eCur').value || 'USD';
+const money = v => { try { return new Intl.NumberFormat(undefined, { style:'currency', currency: curCode(), maximumFractionDigits: Math.abs(v) >= 100 || ['IDR','VND','JPY','KRW','COP','ARS','NGN','PKR'].includes(curCode()) ? 0 : 2 }).format(v); } catch(e){ return curCode() + ' ' + Math.round(v).toLocaleString(); } };
+const num = v => Math.round(v).toLocaleString('en-US');
+const val = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+
+// ---------- routing ----------
+const VIEWS = ['earnings','hooks','checklist','post-times','clipforge'];
+function route(){
+  const h = (location.hash || '').slice(1); const v = VIEWS.includes(h) ? h : 'earnings';
+  document.querySelectorAll('section.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
+}
+window.addEventListener('hashchange', () => { route(); window.scrollTo({ top: document.querySelector('nav').offsetTop, behavior:'smooth' }); });
+route();
+
+// ---------- persistence of inputs ----------
+const saved = store.get('inputs', {});
+document.querySelectorAll('input[id],select[id]').forEach(el => {
+  if (el.type === 'checkbox') return;
+  if (saved[el.id] !== undefined) el.value = saved[el.id];
+  el.addEventListener('input', () => { saved[el.id] = el.value; store.set('inputs', saved); });
+});
+
+// ---------- earnings ----------
+[0.75, 1, 2, 3, 5].forEach(r => { const b = document.createElement('button'); b.className = 'chip'; b.textContent = '$' + r; b.onclick = () => { $('eRate').value = r; saved.eRate = r; store.set('inputs', saved); calc(); }; $('rateChips').append(b); });
+function calc(){
+  const views = val('eViews'), rate = val('eRate'), fee = val('eFee')/100, fx = val('eFx') || 1, min = val('eMin'), max = val('eMax');
+  const gross = views/1000*rate, capped = max > 0 ? Math.min(gross, max) : gross, feeAmt = capped*fee, net = capped - feeAmt;
+  const belowMin = min > 0 && gross < min;
+  $('eNet').textContent = usd(belowMin ? 0 : net);
+  $('eNetPhp').textContent = curCode() === 'USD' ? '' : '≈ ' + money((belowMin ? 0 : net) * fx);
+  $('eGross').textContent = usd(capped) + (gross > capped ? ' (capped)' : '');
+  $('eFeeAmt').textContent = '−' + usd(feeAmt);
+  $('eMinViews').textContent = rate > 0 ? num(min/rate*1000) : '—';
+  $('eCapViews').textContent = rate > 0 && max > 0 ? num(max/rate*1000) : 'no cap';
+  let a = '';
+  if (rate <= 0) a = '<div class="alert warn">Enter the campaign rate.</div>';
+  else if (belowMin) a = '<div class="alert bad">Below the minimum: this clip pays nothing until it reaches ' + num(min/rate*1000) + ' views (' + num(min/rate*1000 - views) + ' more).</div>';
+  else if (gross > capped) a = '<div class="alert warn">You hit the cap. Views past ' + num(max/rate*1000) + ' earn nothing on this clip, so post a new version instead.</div>';
+  else a = '<div class="alert good">That\'s ' + money(net*fx/Math.max(1, views/1000)) + ' per 1,000 views in your pocket.</div>';
+  $('eAlert').innerHTML = a;
+  // goal planner
+  const goal = val('gGoal'), perDay = Math.max(1, val('gClips')), acc = Math.max(1, val('gAcc'));
+  const monthClips = perDay * acc * 30, netPerK = rate * (1 - fee) * fx;
+  const totalViews = netPerK > 0 ? goal / netPerK * 1000 : 0, perClip = totalViews / monthClips;
+  $('gViews').innerHTML = num(perClip) + '<small>views</small>';
+  $('gMonthClips').textContent = num(monthClips);
+  $('gTotal').textContent = num(totalViews);
+  $('gPer').textContent = money(goal / monthClips);
+  const minViews = rate > 0 ? min/rate*1000 : 0;
+  let g = '';
+  if (netPerK <= 0) g = '';
+  else if (perClip < minViews) g = '<div class="alert warn">Careful: ' + num(perClip) + ' views per clip is under this campaign\'s minimum (' + num(minViews) + ' views), so many clips would pay nothing. Fewer, stronger clips that clear the minimum work better.</div>';
+  else if (perClip > 100000) g = '<div class="alert warn">That\'s a lot of views per clip. Post more clips, add accounts slowly, or pick a higher-paying campaign.</div>';
+  else g = '<div class="alert good">Doable with consistent posting. Serious clippers posting 10–20 times a day across 3–6 accounts make about $400–$1,500 a month.</div>';
+  $('gAlert').innerHTML = g;
+}
+['eViews','eRate','eFee','eFx','eMin','eMax','gGoal','gClips','gAcc'].forEach(id => $(id).addEventListener('input', calc));
+function onCur(first){
+  const c = curCode(), row = CUR.find(x => x[0] === c) || CUR[0];
+  $('fxCode').textContent = c; $('fxRow').style.display = c === 'USD' ? 'none' : '';
+  const fxs = store.get('fx', {});
+  $('eFx').value = c === 'USD' ? 1 : (fxs[c] || row[2]);
+  $('gCurNote').textContent = '(' + c + ')';
+  if (!first){ const g = store.get('goals', {}); $('gGoal').value = g[c] || Math.round(200 * row[2]); }
+  calc();
+}
+$('eCur').addEventListener('change', () => { saved.eCur = $('eCur').value; store.set('inputs', saved); onCur(false); });
+$('eFx').addEventListener('input', () => { const fxs = store.get('fx', {}); fxs[curCode()] = val('eFx'); store.set('fx', fxs); });
+$('gGoal').addEventListener('input', () => { const g = store.get('goals', {}); g[curCode()] = val('gGoal'); store.set('goals', g); });
+if (!saved.eCur) $('eCur').value = guessCur(); else $('eCur').value = saved.eCur;
+if (saved.gGoal === undefined) $('gGoal').value = Math.round(200 * ((CUR.find(x => x[0] === curCode()) || CUR[0])[2]));
+onCur(true);
+
+// ---------- hooks ----------
+const T = {
+  reaction: ['WAIT FOR {C} REACTION','{C} WAS NOT READY FOR THIS','THIS BROKE {O} COMPLETELY','{C} LOST IT OVER THIS','NOBODY EXPECTED THIS IN {T}','HE SCREAMED SO LOUD AT THIS','THE CHAT COULDN\'T BELIEVE IT'],
+  first: ['{C} FINALLY PLAYS {T}','POV: YOU FINALLY PLAY {T}','HE WAITED YEARS FOR THIS','FIRST TIME IN {T} AND THIS HAPPENED','{C} FIRST {T} EXPERIENCE','HIS FIRST 10 SECONDS OF {T}'],
+  reveal: ['{T} CAN ACTUALLY DO THIS?!','NOBODY TALKS ABOUT THIS IN {T}','YOU DIDN\'T KNOW {T} DID THIS','{T} HAS A SECRET FEATURE','THIS {T} DETAIL IS INSANE','{C} FOUND THIS IN {T}'],
+  fail: ['THIS IS WHY HE NEVER WINS','HE HAD ONE JOB IN {T}','{C} DID THE IMPOSSIBLE','THE WORST {T} LUCK EVER','HOW DID THIS EVEN HAPPEN','{C} WILL NEVER LIVE THIS DOWN'],
+  take: ['{T} JUST CHANGED EVERYTHING','{C} SAID WHAT EVERYONE THINKS','THIS TAKE IS GOING TO MAKE PEOPLE MAD','{C} IS NOT WRONG ABOUT {T}','NOBODY WANTS TO ADMIT THIS','HE REALLY SAID THIS LIVE'],
+  funny: ['{C} CAN\'T STOP LAUGHING','THIS CONVERSATION WENT WRONG FAST','HE DID NOT EXPECT THAT ANSWER','THE WAY {C} REACTED','I CAN\'T STOP REPLAYING THIS','THIS IS THE FUNNIEST {T} MOMENT'],
+  story: ['{C} FINALLY TOLD THE TRUTH','WAIT UNTIL YOU HEAR THE ENDING','THIS STORY GETS WORSE AND WORSE','HE NEVER TOLD ANYONE THIS','THE MOMENT EVERYTHING CHANGED','{C} REGRETS THIS TO THIS DAY'],
+};
+const LINE2 = {
+  reaction:['He was NOT ready 😭','The reaction says everything 💀','Chat went crazy 🤯'],
+  first:['First time and this happens 🤯','He waited so long for this 😭','Worth the wait?'],
+  reveal:['Did you know this? 🤯','Most people missed this 👀','Wait for it…'],
+  fail:['How does this even happen 💀','He had one job 😭','Watch till the end'],
+  take:['Agree or disagree? 👀','He said what everyone\'s thinking','This will start a fight 💀'],
+  funny:['I can\'t stop replaying this 😭','The timing 💀','Why is this so funny'],
+  story:['Wait for the ending 😳','This got real fast','He finally said it'],
+};
+const NICHE_TAGS = { gaming:['#gaming','#streamer','#twitchclips'], podcast:['#podcast','#podcastclips','#podcasts'], irl:['#streamer','#irlstream','#kickclips'] };
+const slug = s => '#' + (s || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+let seed = 0;
+function shuffle(arr, s){ const a = arr.slice(); let x = s * 9301 + 49297; for (let i = a.length-1; i > 0; i--){ x = (x * 9301 + 49297) % 233280; const j = Math.floor(x / 233280 * (i+1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function fixCreator(t){
+  // "{C} REACTION" → "XQC'S REACTION"; "{C} WAS" → "XQC WAS"
+  const cr = ($('hCreator').value || '').trim().toUpperCase();
+  return t.replace(/\{C\} (REACTION|FIRST)/g, (m, w) => (cr ? cr + "'S " : 'HIS ') + w).replace(/\{O\}/g, cr || 'HIM').replace(/\{C\}/g, cr || 'HE');
+}
+function genHooks(){
+  const type = $('hType').value;
+  const raw = shuffle(T[type], seed).map(fixCreator);
+  const topic = ($('hTopic').value || 'this').trim().toUpperCase(), thing = ($('hThing').value || '').trim().toUpperCase();
+  const out = [];
+  for (const t of raw){
+    let s = t.replace(/\{T\}/g, topic);
+    if (s.includes('{X}')){ if (!thing) continue; s = s.replace(/\{X\}/g, thing); }
+    s = s.replace(/\s+/g,' ').trim();
+    if (!out.includes(s)) out.push(s);
+    if (out.length >= 5) break;
+  }
+  $('hHooks').innerHTML = '';
+  out.forEach(h => {
+    const n = h.split(' ').length;
+    const row = document.createElement('div'); row.className = 'hook';
+    row.innerHTML = '<span class="t"></span><span class="wc ' + (n >= 5 && n <= 8 ? 'g' : 'y') + '">' + n + ' words</span>';
+    row.querySelector('.t').textContent = h;
+    const b = document.createElement('button'); b.className = 'btn sm'; b.textContent = 'Copy'; b.onclick = () => copy(h);
+    row.append(b); $('hHooks').append(row);
+  });
+  // caption
+  const plat = $('hPlat').value, niche = $('hNiche').value;
+  const topicRaw = ($('hTopic').value || '').trim(), cr = ($('hCreator').value || '').trim(), thingRaw = ($('hThing').value || '').trim();
+  const first = thingRaw ? (topicRaw ? topicRaw + ': ' : '') + thingRaw.charAt(0).toUpperCase() + thingRaw.slice(1) + '?? 🤯' : (topicRaw ? topicRaw + ' moment nobody expected 🤯' : 'Nobody expected this 🤯');
+  const l2 = shuffle(LINE2[type], seed)[0];
+  let tags = [];
+  if (topicRaw) tags.push(slug(topicRaw));
+  if (/gta ?6|gta ?vi/i.test(topicRaw)) tags.push('#gtavi');
+  if (cr) tags.push(slug(cr));
+  tags.push(...NICHE_TAGS[niche]);
+  if (plat === 'yt') tags.unshift('#shorts');
+  tags = [...new Set(tags.filter(t => t.length > 1))].slice(0, 5);
+  $('hTags').textContent = tags.join(' ');
+  $('hTagNote').textContent = plat === 'ig' ? '(max 5 on Instagram)' : plat === 'yt' ? '(first 3 show above the title)' : '(3–5 specific beats a long list)';
+  $('hCaption').textContent = first + ' ' + l2 + (cr ? '\n🎥 ' + cr : '') + '\n' + tags.join(' ');
+  let title = thingRaw ? (topicRaw ? topicRaw + ' ' : '') + thingRaw : (out[0] ? out[0].charAt(0) + out[0].slice(1).toLowerCase() : topicRaw);
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  if (!/[?!]$/.test(title)) title += '?!';
+  const tagPart = (topicRaw ? ' ' + slug(topicRaw) : '') + ' #shorts';
+  if ((title + tagPart).length > 60) title = title.slice(0, 60 - tagPart.length - 1).trim() + '…';
+  $('hTitle').textContent = title + tagPart;
+  $('hTitleNote').textContent = '(' + (title + tagPart).length + '/60 characters)';
+}
+$('hGo').onclick = () => { seed++; genHooks(); };
+['hType','hTopic','hCreator','hThing','hNiche','hPlat'].forEach(id => $(id).addEventListener('input', genHooks));
+genHooks();
+
+// ---------- copy ----------
+let tt = null;
+function copy(text){
+  const done = () => { const t = $('toast'); t.textContent = 'Copied'; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 1200); };
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.append(ta); ta.select(); try { document.execCommand('copy'); done(); } catch(e){ $('toast').textContent = 'Select and copy it manually'; $('toast').classList.add('on'); } ta.remove(); };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+}
+document.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy($(b.dataset.copy).textContent));
+
+// ---------- checklist ----------
+const CHECKS = [
+  'Footage is covered by a campaign, or credited and safe to use',
+  'Moment works with zero context and opens on the peak',
+  'Hook headline on screen in the first second, 5–8 words',
+  'Under 20 seconds unless it\'s a story; no dead air, no repeated lines',
+  'Ends on the payoff (or loops back to the start)',
+  'Captions burned in, synced, swears starred, nothing misheard',
+  'No slurs, nudity, gore or political memes on screen',
+  '1080×1920 MP4, no other app\'s watermark, clean export per platform',
+  'Caption: search-style first line + credit + 3–5 specific hashtags',
+  'Campaign\'s required tags, mentions and disclosure included',
+  'Different version for each account, not the same file',
+  'Submitted to the campaign within 30 minutes of posting; don\'t edit or delete after',
+  'Check retention and viewed-vs-swiped after 24–48 hours',
+];
+let ticks = store.get('ticks', []);
+function renderChecks(){
+  $('cList').innerHTML = '';
+  CHECKS.forEach((c, i) => {
+    const l = document.createElement('label'); l.className = ticks[i] ? 'done' : '';
+    l.innerHTML = '<input type="checkbox"' + (ticks[i] ? ' checked' : '') + '><span></span>';
+    l.querySelector('span').textContent = c;
+    l.querySelector('input').onchange = e => { ticks[i] = e.target.checked; store.set('ticks', ticks); renderChecks(); };
+    $('cList').append(l);
+  });
+  const n = ticks.filter(Boolean).length;
+  $('cScore').textContent = n + '/' + CHECKS.length;
+  $('cMeter').style.width = (n / CHECKS.length * 100) + '%';
+}
+$('cReset').onclick = () => { ticks = []; store.set('ticks', ticks); renderChecks(); };
+function grade(){
+  const len = val('cLen'), hook = $('cHook').value.trim(), n = hook ? hook.split(/\s+/).length : 0;
+  const items = [];
+  items.push(len <= 15 ? ['good','Length ' + len + 's: right in the sweet spot (7–15s gets the most views).'] : len <= 20 ? ['good','Length ' + len + 's: good for most campaign clips.'] : len <= 60 ? ['warn','Length ' + len + 's: only keep it this long if it\'s a story. Cut every pause.'] : ['bad','Length ' + len + 's: too long for most clips. A 15s clip watched fully beats a 60s one watched halfway.']);
+  items.push(!n ? ['bad','No hook headline yet. Viewers decide in under a second.'] : n >= 5 && n <= 8 ? ['good','Hook is ' + n + ' words: readable in one glance.'] : n < 5 ? ['warn','Hook is ' + n + ' words: can work, but 5–8 usually says more.'] : ['warn','Hook is ' + n + ' words: too long to read in one glance. Trim it.']);
+  $('cGrade').innerHTML = items.map(([k, t]) => '<div class="alert ' + k + '" style="margin-top:8px"></div>').join('');
+  $('cGrade').querySelectorAll('.alert').forEach((el, i) => el.textContent = items[i][1]);
+}
+['cLen','cHook'].forEach(id => $(id).addEventListener('input', grade));
+renderChecks(); grade();
+
+// ---------- pro ----------
+const PRO_URL = 'https://whop.com/checkout/plan_Ck8NEnFvXmkP6';
+if (PRO_URL){ $('proBtn').href = PRO_URL; }
+else { $('proBtn').textContent = 'Pro: coming soon'; $('proBtn').removeAttribute('href'); $('proBtn').style.opacity = '.6'; $('proBtn').style.cursor = 'default'; }
+
+// ---------- post times ----------
+const AUD = [
+  { id:'us-east', label:'US (East)', zone:'America/New_York' },
+  { id:'us-west', label:'US (West)', zone:'America/Los_Angeles' },
+  { id:'uk', label:'UK / Ireland', zone:'Europe/London' },
+  { id:'eu', label:'Europe', zone:'Europe/Berlin' },
+  { id:'ph', label:'Philippines', zone:'Asia/Manila' },
+  { id:'sea', label:'Indonesia / Thailand / Vietnam', zone:'Asia/Jakarta' },
+  { id:'in', label:'India', zone:'Asia/Kolkata' },
+  { id:'au', label:'Australia (East)', zone:'Australia/Sydney' },
+  { id:'mx', label:'Mexico', zone:'America/Mexico_City' },
+  { id:'br', label:'Brazil', zone:'America/Sao_Paulo' },
+];
+const WINDOWS = [
+  { from:18, to:22, label:'Evening peak', note:'The busiest scrolling time almost everywhere. Post your best clip here.' },
+  { from:11, to:14, label:'Lunch break', note:'Second window, good for your second clip of the day.' },
+  { from:22, to:24, label:'Late night', note:'Night scrollers. Good for a third post.' },
+];
+let myZone = 'UTC'; try { myZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch(e){}
+$('tzName').textContent = myZone.replace(/_/g,' ');
+function zoneOffset(zone, ms){
+  // minutes that `zone` is ahead of UTC at instant ms
+  const p = {}; new Intl.DateTimeFormat('en-US', { timeZone:zone, hourCycle:'h23', year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'numeric' }).formatToParts(new Date(ms)).forEach(x => p[x.type] = x.value);
+  return (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour % 24, +p.minute) - ms) / 60000;
+}
+function zonedInstant(zone, hour){
+  // today's date in that zone, at `hour` local time there
+  const now = Date.now(), p = {};
+  new Intl.DateTimeFormat('en-US', { timeZone:zone, year:'numeric', month:'numeric', day:'numeric' }).formatToParts(new Date(now)).forEach(x => p[x.type] = x.value);
+  let guess = Date.UTC(+p.year, +p.month-1, +p.day, hour, 0);
+  let t = guess - zoneOffset(zone, guess) * 60000;
+  t = guess - zoneOffset(zone, t) * 60000;
+  return t;
+}
+const myFmt = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit', timeZone: myZone });
+const myDay = new Intl.DateTimeFormat('en-CA', { timeZone: myZone });
+const h12 = h => { h = h % 24; return (h % 12 || 12) + (h < 12 ? ' AM' : ' PM'); };
+function renderSlots(id){
+  const a = AUD.find(x => x.id === id) || AUD[0];
+  store.set('aud', a.id);
+  document.querySelectorAll('#audChips .chip').forEach(c => c.classList.toggle('on', c.dataset.id === a.id));
+  const same = zoneOffset(a.zone, Date.now()) === zoneOffset(myZone, Date.now());
+  $('slotHead').textContent = 'Best windows for a ' + a.label + ' audience';
+  $('slots').innerHTML = WINDOWS.map(w => {
+    const s = zonedInstant(a.zone, w.from), e = zonedInstant(a.zone, w.to);
+    const theirs = same ? 'Same as your time' : h12(w.from) + '–' + h12(w.to) + ' their time';
+    return '<div class="slot"><div class="tm">' + myFmt.format(new Date(s)) + '–' + myFmt.format(new Date(e)) + '<small>' + theirs + '</small></div><div><b>' + w.label + '</b><div class="note">' + w.note + '</div></div></div>';
+  }).join('');
+}
+AUD.forEach(a => { const b = document.createElement('button'); b.className = 'chip'; b.dataset.id = a.id; b.textContent = a.label; b.onclick = () => renderSlots(a.id); $('audChips').append(b); });
+const guess = (AUD.find(a => a.zone === myZone) || {}).id;
+renderSlots(store.get('aud', guess || 'us-east'));
+</script>
+</body>
+</html>
