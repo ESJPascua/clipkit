@@ -25,7 +25,7 @@ export async function onRequestGet({ request, env }) {
       client_id: env.WHOP_CLIENT_ID,
       code_verifier: pkce.v,
     };
-    if (env.WHOP_CLIENT_SECRET) body.client_secret = env.WHOP_CLIENT_SECRET;
+    // Public OAuth client (PKCE): no client secret is sent.
     const tr = await fetch('https://api.whop.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

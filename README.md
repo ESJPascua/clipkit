@@ -24,6 +24,5 @@ Hosted on Cloudflare Pages (free plan, commercial use allowed).
 | `WHOP_CLIENT_ID` | Your Whop app id (`app_...`) |
 | `WHOP_API_KEY` | Whop API key for the ClipKit business (secret) |
 | `SESSION_SECRET` | Any long random string (secret) |
-| `WHOP_CLIENT_SECRET` | Optional, if your Whop app shows one (secret) |
 
 In the Whop app's OAuth settings, add the redirect URI `https://YOUR-SITE.pages.dev/callback`.
